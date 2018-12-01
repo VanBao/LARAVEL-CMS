@@ -25,6 +25,8 @@ use App\FileData;
 
 use Session;
 
+use Carbon\Carbon;
+
 class Database 
 {
 
@@ -34,8 +36,8 @@ class Database
 		$this->model = null;
 	}
 
-	private function setModel($modelName){
-		switch ($modelName) {
+	private function setModel($table){
+		switch ($table) {
 			case 'page':
 				$this->model = new Page;
 				break;
@@ -71,26 +73,25 @@ class Database
 				break;		
 		}
 
-		$this->model = $this->model::on((session::has("lang")) ? "mysql_".session("lang") : "mysql_vn");
+		$this->model = $this->model->setConnection((session::has("lang")) ? "mysql_".session("lang") : "mysql_vn");
 
 	}
 
-	public function alone_data_where($model, $arrWhere){
-		$this->setModel($model);
+	public function alone_data_where($table, $arrWhere){
+		if(empty($arrWhere)){
+			return NULL;
+		}
+		$this->setModel($table);
 		return $this->model->where($arrWhere)->first();
 	}
 
-	public function list_data_where($model, $by = 'id', $order = 'ASC', $arrWhere = array()){
-		$this->setModel($model);
-		if(count($arrWhere) != 0){
-			$this->model->where($arrWhere);
-		} 
-		return $this->model->orderBy($by, $order)->get();
-	}
-
-	public function delete($model, $where, $operator, $value){
-		$this->setModel($model);
-		return $this->model->where($where, $operator, $value)->delete();
+	public function list_data_where($table, $by = 'id', $order = 'ASC', $arrWhere = array()){
+		$this->setModel($table);
+		if(!empty($arrWhere)){
+			$this->model = $this->model->where($arrWhere);
+		}
+		$this->model = $this->model->orderBy($by, $order);
+		return $this->model->get();
 	}
 
 	public function allListDataChild($arrMenu, $start = 0, $limit = '', $by = 'id', $order = 'ASC', $arrWhere = array()){
@@ -100,10 +101,10 @@ class Database
 				$query->orWhere("menu", $menu);
 			}
 		});
-		if(count($arrWhere) != 0){
+		if(!empty($arrWhere)){
 			$this->model = $this->model->where($arrWhere);
 		}
-		$this->model->orderBy($by, $order);
+		$this->model = $this->model->orderBy($by, $order);
 		if(is_numeric($limit)){
 			$this->model = $this->model->offset($start)->limit($limit);
 		}
@@ -131,6 +132,61 @@ class Database
 
 	public function allListMenuChild($menuId){
 
+	}
+
+	public function insertData($table, $data){
+		if(empty($data)){
+			return false;
+		}
+		$this->setModel($table);
+		foreach($data as $key => $value){
+			$this->model->$key = $value;
+		}
+		return $this->model->save();
+	}
+
+	public function updateData($table, $data, $arrWhere){
+		if(empty($data) || empty($arrWhere)){
+			return false;
+		}
+		$this->setModel($table);
+		$this->model = $this->model->where($arrWhere);
+		foreach($data as $key => $value){
+			$this->model->$key = $value;
+		}
+		return $this->model->save();
+	}
+
+	public function insertSlug($title, $tableName, $idTable){
+		$isSuccess = $this->insertData("slug", ["slugName" => renameTitle($title), "tableName" => $tableName, "idTable" => $idTable]);
+		if($isSuccess){
+			$this->findOrCreateSlug($title, $tableName, $idTable);
+		}else{
+			$this->findOrCreateSlug($title.'-'.Carbon::now()->timestamp, $tableName, $idTable);
+		}
+
+	}
+
+	public function updateSlug($slugName, $id){
+		$slug = $this->alone_data_where("slug", ["slugName" => $slugName]);
+		if(!is_null($slug) && $slug->id != $id){
+			$this->updateData("slug", ["slugName" => renameTitle($slugName . '-' . Carbon::now()->timestamp)], ["id", $id]);
+		}else{
+			$this->updateData("slug", ["slugName" => renameTitle($slugName)], ["id", $id]);
+		}
+	}
+
+	public function deleteData($table, $arrWhere){
+		if(empty($arrWhere)){
+			return false;
+		}
+		$this->setModel($table);
+		$this->model = $this->model->where($arrWhere);
+		return $this->model->delete();
+	}
+
+	public function getLastId(){
+		return $this->model->id;
 	}
 
 }

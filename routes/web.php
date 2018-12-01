@@ -12,15 +12,15 @@
 */
 Route::middleware(['checkLanguage'])->group(function(){
 
-	Route::get('/{lang}/{slug?}/{currPage?}', ["as" => "user", "uses" => "PageController@showUserWithLang"]);
+	Route::get('/{lang}/{slug?}/{currPage?}', ["as" => "user", "uses" => "PageController@showUser"]);
 
 	Route::get('/{slug?}/{currPage?}', ["as" => "lang.user", "uses" => "PageController@showUser"]);
 
-	Route::get('/{lang}/admin/{slug?}', ['as' => "admin", "uses" => "PageController@showAdminWithLang"]);
+	Route::get('/{lang}/admin/{slug?}', ['as' => "admin", "uses" => "PageController@showAdmin"]);
 
 	Route::get('/admin/{slug?}', ['as' => "lang.admin", "uses" => "PageController@showAdmin"]);
 
-	Route::get('/{lang}/admin/cau-hinh/{slug}', ["as" => "config", "uses" => "PageController@showConfigWithLang"]);
+	Route::get('/{lang}/admin/cau-hinh/{slug}', ["as" => "config", "uses" => "PageController@showConfig"]);
 
 	Route::get('/admin/cau-hinh/{slug}', ["as" => "lang.config", "uses" => "PageController@showConfig"]);
 

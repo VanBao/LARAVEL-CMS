@@ -8,6 +8,10 @@ use App\Database;
 
 use App;
 
+use Carbon\Carbon;
+
+use Lang;
+
 class PageController extends Controller
 {
 
@@ -21,30 +25,20 @@ class PageController extends Controller
         $this->menuData = array();
     }
 
-    public function showUser(Request $request, $slug = '', $currPage = '')
+    public function showUser(Request $request)
     {
-        var_dump($request->query("aa"));
-        $this->parseSlug($request, $slug, $lang = '', $currPage, $isAdmin = false, $isConfig = false);
-        $this->getUserMenuData();
-        return view($this->menuData["configMenu"]->customHtml, $this->menuData);
-    }
-
-    public function showUserWithLang(Request $request, $lang, $slug = '', $currPage = '')
-    {
-        $this->parseSlug($request, $slug, $lang, $currPage, $isAdmin = false, $isConfig = false);
-        $this->getUserMenuData();
+        $routeParam = $request->route()->parameters();
+        $slug = isset($routeParam["slug"]) ? $routeParam["slug"] : "";
+        $lang = isset($routeParam["lang"]) ? $routeParam["lang"] : "";
+        $currPage = isset($routeParam["currPage"]) ? $routeParam["currPage"] : "";
+        $this->parseSlug($request, $slug, $lang, $currPage, $isConfig = false);
+        $this->parseContent();
         return view($this->menuData["configMenu"]->customHtml, $this->menuData);
     }
 
     public function showAdmin(Request $request, $slug = '')
     {
-        $this->parseSlug($request, $slug, $lang = '', $currPage = '', $isAdmin = false, $isConfig = false);
-
-
-    }
-    public function showAdminWithLang(Request $request, $lang, $slug = '')
-    {
-        $this->parseSlug($request, $slug, $lang, $currPage = '', $isAdmin = false, $isConfig = false);
+        $this->parseSlug($request, $slug, $lang = '', $currPage = '', $isConfig = false);
 
 
     }
@@ -54,12 +48,7 @@ class PageController extends Controller
 
     }
 
-    public function showConfigWithLang(Request $request, $lang, $slug = '')
-    {
-
-    }
-
-    public function parseSlug(Request $request, $slug, $lang, $currPage, $isAdmin, $isConfig)
+    public function parseSlug(Request $request, $slug, $lang, $currPage, $isConfig)
     {
 
         try{
@@ -118,7 +107,7 @@ class PageController extends Controller
         if(strlen($data->keywords)) $this->menuData["keywords"] = $data->keywords;
     }
 
-    public function getUserMenuData(){
+    public function parseContent(){
         $listPage = $this->database->list_data_where('page');
         $this->menuData["infoPage"] = new \stdClass();
         foreach($listPage as $page){
@@ -142,5 +131,34 @@ class PageController extends Controller
         // continue
     }
 
-    public function postData();
+    public function postData(Request $request){
+        $input = $request->all();
+        if(isset($input["table"])){
+            $table = $input["table"];
+            $action = $input["action"];
+            unset($input["table"]);
+            unset($input["action"]);
+            if($table == 'data'){
+                $input["time"] = Carbon::now()->timestamp;
+            }
+            switch ($action) {
+                case 'add':
+                    $input["title"] = Lang::get('string.title');
+                    $this->database->insertData($table, $input);
+                    if($table == "menu" || ($table == "data" && isset($input["menu"]) && !isset($input["data"]))){
+                        $this->insertSlug($input["title"], $table, $this->database->getLastId());
+                    }
+                    break;
+                case 'del':
+                    if($request->filled("id")){
+                        
+                    }
+                    break;
+                
+                default:
+                    # code...
+                    break;
+            }
+        }
+    }
 }
