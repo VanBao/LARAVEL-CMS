@@ -36,13 +36,19 @@ class PageController extends Controller
         $lang = isset($routeParam["lang"]) ? $routeParam["lang"] : "";
         $currPage = isset($routeParam["currPage"]) ? $routeParam["currPage"] : "";
         $this->parseSlug($request, $slug, $lang, $currPage, $isConfig = false);
-        $this->parseContent();
+        $this->getData();
         return view($this->menuData["configMenu"]->customHtml, $this->menuData);
     }
 
     public function showAdmin(Request $request, $slug = '')
     {
-        $this->parseSlug($request, $slug, $lang = '', $currPage = '', $isConfig = false);
+        $routeParam = $request->route()->parameters();
+        $slug = isset($routeParam["slug"]) ? $routeParam["slug"] : "";
+        $lang = isset($routeParam["lang"]) ? $routeParam["lang"] : "";
+        $currPage = isset($routeParam["currPage"]) ? $routeParam["currPage"] : "";
+        $this->parseSlug($request, $slug, $lang, $currPage, $isConfig = false);
+        $this->getData($isAdmin = true);
+        return view($this->menuData["configMenu"]->customHtml, $this->menuData);
 
 
     }
@@ -111,28 +117,32 @@ class PageController extends Controller
         if(strlen($data->keywords)) $this->menuData["keywords"] = $data->keywords;
     }
 
-    public function parseContent(){
-        $listPage = $this->database->list_data_where('page');
-        $this->menuData["infoPage"] = new \stdClass();
-        foreach($listPage as $page){
-            $key = $page->name;
-            if(strlen($key)){
-                $this->menuData["infoPage"]->$key = $page->content;
-            }
-        }
-        $this->menuData["listMenu"] = $this->database->list_data_where("menu", "pos", "ASC", [["menu_parent", 0], ["hide", 0]]); 
-        $this->menuData["title"] = $this->menuData["infoPage"]->title;
-        $this->menuData["image"] = $this->menuData["infoPage"]->logo;
-        $this->menuData["des"] = $this->menuData["infoPage"]->des;
-        $this->menuData["keywords"] = $this->menuData["infoPage"]->keywords;
-        if(isset($this->menuData["page"])){
-            $this->setInfo($this->menuData["page"]);
-        }else if(isset($this->menuData["menuChild"])){
-            $this->setInfo($this->menuData["menuChild"]);
+    public function getData($isAdmin = false){
+        if($isAdmin){
+
         }else{
-            $this->setInfo($this->menuData["menuPage"]);
-        }
+            $listPage = $this->database->list_data_where('page');
+            $this->menuData["infoPage"] = new \stdClass();
+            foreach($listPage as $page){
+                $key = $page->name;
+                if(strlen($key)){
+                    $this->menuData["infoPage"]->$key = $page->content;
+                }
+            }
+            $this->menuData["listMenu"] = $this->database->list_data_where("menu", "pos", "ASC", [["menu_parent", 0], ["hide", 0]]); 
+            $this->menuData["title"] = $this->menuData["infoPage"]->title;
+            $this->menuData["image"] = $this->menuData["infoPage"]->logo;
+            $this->menuData["des"] = $this->menuData["infoPage"]->des;
+            $this->menuData["keywords"] = $this->menuData["infoPage"]->keywords;
+            if(isset($this->menuData["page"])){
+                $this->setInfo($this->menuData["page"]);
+            }else if(isset($this->menuData["menuChild"])){
+                $this->setInfo($this->menuData["menuChild"]);
+            }else{
+                $this->setInfo($this->menuData["menuPage"]);
+            }
         // continue
+        }
     }
 
     public function postData(Request $request){
@@ -218,16 +228,16 @@ class PageController extends Controller
                         }
                         break;
                         default:
-                            foreach($listFile as $key => $file){
-                                $data = $this->database->alone_data_where($input["table"], [["id", $input["id"]]]);
-                                if(!empty($data)){
-                                    if($data->img !== ''){
-                                        Storage::disk('public')->delete($data->img);
-                                    }
-                                    $fileName = $file->storeAs("upload", $file->getClientOriginalName(), "public");
-                                    $this->database->updateDate($input["table"], ["img" => $fileName], [["id", $input["id"]]]);
+                        foreach($listFile as $key => $file){
+                            $data = $this->database->alone_data_where($input["table"], [["id", $input["id"]]]);
+                            if(!empty($data)){
+                                if($data->img !== ''){
+                                    Storage::disk('public')->delete($data->img);
                                 }
+                                $fileName = $file->storeAs("upload", $file->getClientOriginalName(), "public");
+                                $this->database->updateDate($input["table"], ["img" => $fileName], [["id", $input["id"]]]);
                             }
+                        }
 
                         break;
                     }
