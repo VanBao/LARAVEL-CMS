@@ -12,6 +12,10 @@ use Carbon\Carbon;
 
 use Lang;
 
+use File;
+
+use Illuminate\Support\Facades\Storage;
+
 class PageController extends Controller
 {
 
@@ -53,18 +57,18 @@ class PageController extends Controller
 
         try{
             if(!$isConfig && $slug == ''){
-                $this->menuData["menuPage"] = $this->database->alone_data_where("menu", [["file", "=", "home"]]);
+                $this->menuData["menuPage"] = $this->database->alone_data_where("menu", [["file", "home"]]);
             }else{
                 if($isConfig){
 
                 }else{
-                    $currentSlug = $this->database->alone_data_where("slug", [["slugName", "=", $slug]]);
+                    $currentSlug = $this->database->alone_data_where("slug", [["slugName", $slug]]);
                     if(!isset($currentSlug)){
                         throw new \Exception("Slug doesn't exist");
                     }
                     switch ($currentSlug->tableName) {
                         case 'menu':
-                        $currentMenu = $this->database->alone_data_where("menu", [["id", "=", $currentSlug->idTable]]);
+                        $currentMenu = $this->database->alone_data_where("menu", [["id", $currentSlug->idTable]]);
                         if($currentMenu->menu_parent != 0){
                             $menuParent = $this->database->menuParent($currentMenu->id);
                             $this->menuData["menuChild"] = $currentMenu;
@@ -133,7 +137,7 @@ class PageController extends Controller
 
     public function postData(Request $request){
         $input = $request->all();
-        if(isset($input["table"])){
+        if(isset($input["action"]) && isset($input["table"])){
             $table = $input["table"];
             $action = $input["action"];
             unset($input["table"]);
@@ -143,21 +147,107 @@ class PageController extends Controller
             }
             switch ($action) {
                 case 'add':
-                    $input["title"] = Lang::get('string.title');
-                    $this->database->insertData($table, $input);
-                    if($table == "menu" || ($table == "data" && isset($input["menu"]) && !isset($input["data"]))){
-                        $this->insertSlug($input["title"], $table, $this->database->getLastId());
-                    }
-                    break;
+                $input["title"] = Lang::get('string.title');
+                $this->database->insertData($table, $input);
+                if($table == "menu" || ($table == "data" && isset($input["menu"]) && !isset($input["data"]))){
+                    $this->insertSlug($input["title"], $table, $this->database->getLastId());
+                }
+                break;
                 case 'del':
-                    if($request->filled("id")){
-                        
+                if(isset($input["id"])){
+                    $data = $this->alone_data_where($table, ["id",$input["id"]]);
+                    $this->deleteData($table, ["id", $input["id"]]);
+                    $this->deleteData('slug', [["tableName", $table], ["idTable", $input["id"]]]);
+                    $imagePath = url('/').'public/upload/'.$data->img;
+                    if(File::exists($imagePath)){
+                        File::delete($imagePath);
                     }
-                    break;
-                
-                default:
-                    # code...
-                    break;
+                    switch ($table) {
+                        case 'menu':
+                        $allListMenuChild = $this->database->allListMenuChild($input["id"]);
+                        $listDataChild = $this->allListDataChild([$input["id"]], 0, '', 'id', 'ASC');
+                        foreach($allListMenuChild as $menuChild){
+                            $this->deleteData("menu", ["id", $menuChild->id]);
+                            $this->deleteData("slug", [["tableName", "menu"], ["idTable", $menuChild->id]]);
+                        }
+                        foreach($listData as $dataChild){
+                            $this->deleteData("data", ["id", $dataChild]);
+                            $this->deleteData("slug", [["tableName", "data"], ["idTable", $dataChild->id]]);
+                        }
+
+                        break;
+
+                        case 'data':
+                        $this->database->deleteData("data", ["data_parent", $input["id"]]);
+                        break;
+                    }
+                }
+                break;
+                case 'delAll':
+                break;
+            }
+        }else{
+            $arrFiles = $request->allFiles();
+            if(count($arrFiles)){
+                foreach($arrFiles as $key => $listFile){
+                    switch ($key) {
+                        case 'slideMenu':
+                        case 'slide':
+                        case 'slide2':
+                        if(isset($input["table"]) && isset($input["id"])){
+                            foreach($listFile as $file){
+                                $fileName = $file->storeAs("upload", $file->getClientOriginalName(), "public");
+                                if($input["table"] == 'data'){
+                                    $this->database->insertData("data", ["data_parent" => $input["id"], "type" => $key, "img" => $fileName]);
+                                }else{
+                                    $this->database->insertData("data", ["menu" => $input["id"], "type" => $key, "img" => $fileName]);
+                                }
+                            }
+                        }
+                        break;
+                        case 'info':
+                        foreach($listFile as $key => $file){
+                            $currInfo = $this->database->alone_data_where("page", [["name", $key]]);
+                            if(!empty($currInfo)){
+                                if($currInfo->content !== ''){
+                                    Storage::disk('public')->delete($currInfo->content);
+                                }
+                                $fileName = $file->storeAs("upload", $file->getClientOriginalName(), "public");
+                                $this->database->updateDate("page", ["content" => $fileName], [["name" , $key]]);
+                            }
+                        }
+                        break;
+                        default:
+                            foreach($listFile as $key => $file){
+                                $data = $this->database->alone_data_where($input["table"], [["id", $input["id"]]]);
+                                if(!empty($data)){
+                                    if($data->img !== ''){
+                                        Storage::disk('public')->delete($data->img);
+                                    }
+                                    $fileName = $file->storeAs("upload", $file->getClientOriginalName(), "public");
+                                    $this->database->updateDate($input["table"], ["img" => $fileName], [["id", $input["id"]]]);
+                                }
+                            }
+
+                        break;
+                    }
+                }
+            }
+            if(isset($input["listRow"])){
+                foreach($input["listRow"] as $table => $row){
+                    foreach($row as $id => $data){
+                        if(isset($data["title"]) && (!isset($data["name"]) || $data["name"] == "")){
+                            $data["name"] = renameTitle($data["title"]);
+                        }
+                        $this->insertData($table, $data, [["id", $id]]);
+                    }
+                }
+            }
+            if(isset($input["listSlug"])){
+                foreach($input["listSlug"] as $id => $slug){
+                    $slug = ($slug !== '') ? renameTitle($slug) : Lang::get('string.title') . "-" . Carbon::now()->timestamp;
+                    $this->database->updateSlug($slug, $id);
+                }
             }
         }
     }

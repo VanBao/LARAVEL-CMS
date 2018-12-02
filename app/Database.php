@@ -113,7 +113,7 @@ class Database
 
 	public function allListMenuParent($menuId, $allListMenuParent = array()){
 		$currentMenu = $this->alone_data_where("menu", "id", "=", $menuId);
-		if(!is_null($currentMenu) && $currentMenu->menu_parent != '0'){
+		if(!is_null($currentMenu) && $currentMenu->menu_parent != 0){
 			$menuParent = $this->alone_data_where("menu", "id", $currentMenu->menu_parent);
 			$allListMenuParent[] = $menuParent;
 			$allListMenuParent = $this->allListMenuParent($currentMenu->menu_parent, $allListMenuParent);
@@ -130,8 +130,16 @@ class Database
 		return $this->list_data_where("menu", "id", "ASC", ["menu", $menuId]);
 	}
 
-	public function allListMenuChild($menuId){
-
+	public function allListMenuChild($menuId, $allListMenuChild = array()){
+		$listMenuChild = $this->listMenuChild($menuId);
+		if(count($listMenuChild)){
+			$allListMenuChild = array_merge($allListMenuChild, $listMenuChild);
+			foreach($listMenuChild as $menuChild){
+				$allListMenuChild = $this->allListMenuChild($menuChild, $allListMenuChild);
+			}
+		}
+		return $allListMenuChild;
+		
 	}
 
 	public function insertData($table, $data){
