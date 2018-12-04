@@ -1,13 +1,18 @@
 <?php
 
-if (!function_exists('isJapanese')) {
-    function isJapanese($str){
+if (!function_exists('isJapanese')) 
+{
+    function isJapanese($str)
+    {
         return isKanji($str) || isHiragana($str) || isKatakana($str);
     }
 }
-if (!function_exists('renameTitle')) {
-    function renameTitle($string){
-        if (!isJapanese($string)) {
+if (!function_exists('renameTitle')) 
+{
+    function renameTitle($string)
+    {
+        if (!isJapanese($string)) 
+        {
             $search  = array(
                 '#(à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ)#',
                 '#(è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ)#',

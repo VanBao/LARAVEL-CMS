@@ -1,0 +1,216 @@
+th{
+  text-align: center;
+}
+.clearfix{
+  width: 100%;
+  padding: 10px 0;
+}
+label[for],img[onclick],a:hover{
+  cursor: pointer;
+}
+.image-circle {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.image img {
+    display: inline;
+    margin: 0 auto;
+    height: 100%;
+    width: auto;
+}
+.info-box img {
+    height: 100px;
+    width: 100%;
+}
+.info-box p{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.just-padding {
+  padding: 15px;
+}
+
+.list-group.list-group-root {
+  padding: 0;
+  overflow: hidden;
+}
+
+.list-group.list-group-root .list-group {
+  margin-bottom: 0;
+}
+
+.list-group.list-group-root .list-group-item {
+  border-radius: 0;
+  border-width: 1px 0 0 0;
+}
+
+.list-group.list-group-root > .list-group-item:first-child {
+  border-top-width: 0;
+}
+
+.list-group.list-group-root > .list-group > .list-group-item {
+  padding-left: 30px;
+}
+
+.list-group.list-group-root > .list-group > .list-group > .list-group-item {
+  padding-left: 45px;
+}
+li{
+  list-style: none;
+}
+ul.tree {
+  /*list-style: none;
+  line-height: 2em;
+  font-family: Arial;
+  padding-top:15px;*/
+  padding-top:5px;
+  margin-left: -20px;
+}
+ul.tree li {
+  font-size: 18px;
+  position: relative; padding-bottom: 5px;
+}
+.thumuc {
+  font-size:14px;
+/*padding: 1.05rem 2.75rem;
+margin: 20px 20px;color: #28aadc;
+background-color: #fff;
+font-size: 16px;
+font-weight: 300;
+text-transform: uppercase;
+border-radius: 12rem;
+border: .2rem solid #28aadc;
+-webkit-transition: color .3s,border .3s;
+transition: color .3s,border .3s;
+*/
+-webkit-transition: color .3s,border .3s;
+transition: color .3s,border .3s;
+}
+
+ul.tree li:before {
+/*  position: absolute;
+  left: -15px;
+  top: 0px;
+  content: '';
+  display: block;
+  border-left: 1px solid #ddd;
+  height: 1em;
+  border-bottom: 1px solid #ddd;
+  width: 30px;*/
+  position: absolute;
+  left: -14px;
+  content: '';
+  display: block;
+  border-left: 1px solid #F00;
+  height: 15px;
+  border-bottom: 1px solid #F00;
+  width: 12px;
+}
+ul.tree li:after {
+  position: absolute;
+  left: -14px;
+  bottom: -7px;
+  content: '';
+  display: block;
+  border-left: 1px solid #F00;
+  height: 100%;
+}
+ul.tree li.root {
+  margin: 0px 0px 0px -20px;
+}
+ul.tree li.root:before {
+  display: none;
+}
+ul.tree li.root:after {
+  display: none;
+}
+ul.tree li:last-child:after {
+  display: none;
+}
+a:hover,a:focus{
+  text-decoration: none;
+}
+.info-box-text {
+    height: 40px;
+    overflow: hidden;
+}
+tbody > tr.selected{
+  background-color:#aab7d1;
+}
+.onoffswitch {
+    position: relative; width: 40px;
+    margin-top:5px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+    display: none;
+}
+.onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    height: 20px; padding: 0; line-height: 20px;
+    border: 2px solid #CCCCCC; border-radius: 20px;
+    background-color: #FFFFFF;
+    transition: background-color 0.3s ease-in;
+}
+.onoffswitch-label:before {
+    content: "";
+    display: block; width: 20px; margin: 0px;
+    background: #FFFFFF;
+    position: absolute; top: 0; bottom: 0;
+    right: 18px;
+    border: 2px solid #CCCCCC; border-radius: 20px;
+    transition: all 0.3s ease-in 0s; 
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label {
+    background-color: #EB4646;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label, .onoffswitch-checkbox:checked + .onoffswitch-label:before {
+   border-color: #EB4646;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label:before {
+    right: 0px; 
+}
+.success{
+  position: fixed;
+  top:0;
+  left:0;
+  width: 100%;
+}
+.spanAlert{
+  color:#00b6ff;
+  font-weight: bold;
+}
+.btn{
+  color:white!important;
+}
+.col-md-3{
+  padding-bottom: 0;
+}
+.codeEditor{
+  height:200px;
+}
+[data-show]{
+  display: none;
+}
+fieldset { 
+  border: 1px solid #c0c0c0;
+  padding: 10px;
+}
+legend{
+  margin-bottom: 0;
+}
+.panel-body{
+  border:none;
+}
+.ace-monokai .ace_print-margin{
+  background:none!important;
+}
+[for=imgMenu] img{
+  max-width: 100px;
+  max-height: 50px;
+}
