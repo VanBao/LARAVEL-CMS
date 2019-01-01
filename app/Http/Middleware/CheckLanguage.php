@@ -6,6 +6,8 @@ use Closure;
 
 use Session;
 
+use App;
+
 class CheckLanguage
 {
     const LANGUAGES = array("vn", "en");
@@ -19,7 +21,10 @@ class CheckLanguage
      */
     public function handle($request, Closure $next)
     {
-        $lang = $request->query('lang');
+        $lang = $request->route('lang');
+        if(session()->has('lang')){
+            session()->forget('lang');
+        }
         if(!empty($lang) && in_array($lang, self::LANGUAGES)){
              App::setLocale($lang);
              session(['lang' => $lang]);

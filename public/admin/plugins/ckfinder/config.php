@@ -1,5 +1,4 @@
 <?php
-include_once('../../../../../../config.php');
 $config = array();
 /*
  * ### CKFinder : Configuration File - Basic Instructions
@@ -56,7 +55,7 @@ Examples:
 
 ATTENTION: The trailing slash is required.
 */
-$baseUrl = 'http://'.$domain.'/';
+$baseUrl = env("APP_URL", "");;
 
 /*
 $baseDir : the path to the local directory (in the server) which points to the

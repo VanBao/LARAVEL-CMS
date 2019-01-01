@@ -11,8 +11,13 @@ class Menu extends Model
     public $timestamps = false;
     
     
-    public function data()
+    public function Data()
     {
-        return $this->hasMany('App\Data');
+        return $this->hasMany('App\Data', "menu", "id");
+    }
+
+    public function File()
+    {
+    	return $this->belongsTo("App\File", "file", "file");
     }
 }

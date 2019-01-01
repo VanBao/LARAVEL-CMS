@@ -4,7 +4,7 @@ function sitemap(e){
     $(e).find('i').removeClass(sitemap).addClass(spin);
     $(e).attr("disabled",true);
     $.ajax({
-      'url': '../modules/sitemap.php'
+      'url': $('base').attr('href')  + '/sitemap'
     }).done(function( data ) {
         alert(data);
         $(e).find('i').removeClass(spin).addClass(sitemap);
@@ -152,13 +152,15 @@ $(function(){
                     $('a[data-action=del]').attr('disabled',true);
                     break;
             }
+            var data = $(this).data();
+            data["_token"] = $('meta[name="csrf-token"]').attr('content');
             $.ajax({
                 type: "POST",
-                url: hrefPost(),
+                url: $('base').attr('current-url'),
                 data: $(this).data(),
                 success: function(data){
                     $('.contentAjax').html(data);
-                    $('.success').fadeOut('slow');
+                    //$('.success').fadeOut('slow');
                 }
             });
         }
@@ -187,11 +189,13 @@ $(function(){
                 })
             }
             var formData = new FormData($(this)[0]);
+            formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+            console.log($('base').attr('current-url'));
             $.ajax({
                 type: "POST",
                 contentType: false,
                 processData: false,
-                url: hrefPost(),
+                url: $('base').attr('current-url'),
                 data: formData, 
                 success: function(data)
                 {
@@ -202,8 +206,6 @@ $(function(){
             });  
         }
     });
-
-    
     loadFunction();
 
 })

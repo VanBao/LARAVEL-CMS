@@ -1,0 +1,3 @@
+ @if (isset($menuPage))
+ 	<div id="infoPage" data-title="{{$title}}" data-name="{{$name}}" data-table="@if(isset($page)) {{'data'}} @else {{'menu'}} @endif" data-idList="@if(isset($menuChild)){{$menuChild->id}}@endif" data-id="@if(isset($page)){{$page->id}}@endif" data-slug="@if($menuPage->file == 'config') {{'admin/cau-hinh/'.$currentSlug->slugName}} @else {{'admin/'.$currentSlug->slugName}} @endif"></div>
+ @endif

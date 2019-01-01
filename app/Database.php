@@ -112,7 +112,8 @@ class Database
 	}
 
 	public function allListMenuParent($menuId, $allListMenuParent = array()){
-		$currentMenu = $this->alone_data_where("menu", "id", "=", $menuId);
+		$currentMenu = $this->alone_data_where("menu", [["id", $menuId]]);
+		$allListMenuParent[] = $currentMenu;
 		if(!is_null($currentMenu) && $currentMenu->menu_parent != 0){
 			$menuParent = $this->alone_data_where("menu", "id", $currentMenu->menu_parent);
 			$allListMenuParent[] = $menuParent;
@@ -127,7 +128,7 @@ class Database
 	}
 
 	public function listMenuChild($menuId){
-		return $this->list_data_where("menu", "id", "ASC", ["menu", $menuId]);
+		return $this->list_data_where("menu", "id", "ASC", [["menu_parent", $menuId]]);
 	}
 
 	public function allListMenuChild($menuId, $allListMenuChild = array()){
@@ -159,28 +160,25 @@ class Database
 		}
 		$this->setModel($table);
 		$this->model = $this->model->where($arrWhere);
-		foreach($data as $key => $value){
-			$this->model->$key = $value;
-		}
-		return $this->model->save();
+		return $this->model->update($data);
 	}
 
 	public function insertSlug($title, $tableName, $idTable){
-		$isSuccess = $this->insertData("slug", ["slugName" => renameTitle($title), "tableName" => $tableName, "idTable" => $idTable]);
-		if($isSuccess){
-			$this->findOrCreateSlug($title, $tableName, $idTable);
-		}else{
-			$this->findOrCreateSlug($title.'-'.Carbon::now()->timestamp, $tableName, $idTable);
+		$slug = $this->alone_data_where("slug", ["slugName" => renameTitle($title)]);
+		if(!is_null($slug)){
+			return $this->insertSlug($title.'-'.Carbon::now()->timestamp, $tableName, $idTable);
+		}else{	
+			return $this->insertData("slug", ["slugName" => renameTitle($title), "tableName" => $tableName, "idTable" => $idTable]);
 		}
 
 	}
 
 	public function updateSlug($slugName, $id){
-		$slug = $this->alone_data_where("slug", ["slugName" => $slugName]);
+		$slug = $this->alone_data_where("slug", ["slugName" => renameTitle($slugName)]);
 		if(!is_null($slug) && $slug->id != $id){
-			$this->updateData("slug", ["slugName" => renameTitle($slugName . '-' . Carbon::now()->timestamp)], ["id", $id]);
+			$this->updateData("slug", ["slugName" => renameTitle($slugName . '-' . Carbon::now()->timestamp)], [["id", $id]]);
 		}else{
-			$this->updateData("slug", ["slugName" => renameTitle($slugName)], ["id", $id]);
+			$this->updateData("slug", ["slugName" => renameTitle($slugName)], [["id", $id]]);
 		}
 	}
 
@@ -195,6 +193,10 @@ class Database
 
 	public function getLastId(){
 		return $this->model->id;
+	}
+
+	public function getSQL(){
+		return $this->model->toSql();
 	}
 
 }

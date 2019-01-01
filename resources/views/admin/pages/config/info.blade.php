@@ -1,12 +1,8 @@
-<?php
-  $listData = $db->list_data_order('page','type','ASC');
-  $listType = array('img','text','content','file', 'switch');
-?>
 <div class="row">
   <div class="col-md-9">
     <div class="panel panel-default grid">
       <div class="panel-heading">
-        <button <?=linkAdd('page')?>><i class="fa fa-plus"></i> Thêm thông tin</button>
+        <button {!!linkAdd('page')!!}><i class="fa fa-plus"></i> Thêm thông tin</button>
         <button class="btn btn-success selectAll" data-target="#tableMenu > tbody > tr" type="button">
           <i class="fa fa-check-square-o"></i> Chọn tất cả
         </button> 
@@ -26,35 +22,35 @@
           </tr>
         </thead>
         <tbody align="center">
-        <?php foreach($listData as $data){ ?>    
+        @foreach($listData as $data)  
           <tr data-id="<?=$data->id?>">
             <td>
-              <input class="form-control" type="text" name="listRow[page][<?=$data->id?>][title]" value="<?=$data->title?>">
+              <input class="form-control" type="text" name="listRow[page][{{$data->id}}][title]" value="{{$data->title}}">
             </td>
             <td>
-              <input class="form-control" type="text" name="listRow[page][<?=$data->id?>][name]" value="<?=$data->name?>">
+              <input class="form-control" type="text" name="listRow[page][{{$data->id}}][name]" value="{{$data->name}}">
             </td>
             <td class="form-inline">
               <div class="form-group">
                 <select class="form-control" name="listRow[page][<?=$data->id?>][type]" >
-                  <?php foreach($listType as $type){ ?>
-                  <option <?=returnWhere('selected',$type,$data->type)?>>
-                    <?=$type?>
+                  @foreach($listType as $type)
+                  <option @if($type == $data->type) {{'selected'}} @endif>
+                    {{$type}}
                   </option>
-                  <?php } ?>
+                  @endforeach
                 </select>
               </div>
             </td>
             <td>
-              <input class="form-control" type="text" name="listRow[page][<?=$data->id?>][content]" value="<?=htmlspecialchars($data->content)?>">
+              <input class="form-control" type="text" name="listRow[page][{{$data->id}}][content]" value="{{$data->content}}">
             </td>
             <td>
-              <button <?=linkDel('page',$data->id)?>>
+              <button {!!linkDelId($data->id, 'page')!!}>
                 <i class="fa fa-trash"></i>
               </button>
             </td>
           </tr>
-        <?php } ?>
+        @endforeach
         </tbody>
       </table>
     </div>

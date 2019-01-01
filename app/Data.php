@@ -10,7 +10,7 @@ class Data extends Model
 
     public $timestamps = false;
 
-    public function Category()
+    public function Menu()
     {
     	return $this->belongsTo("App\Menu", "menu", "id");
     }
