@@ -220,18 +220,6 @@ function getAjax(href,his = false){
     });
 }
 $(document).ready(function(){
-    window.history.pushState("", "", document.URL);
-
-    $('body').on('click','a[data-name]',function(e){
-        e.preventDefault();
-        var href = $(this).attr('href');
-        getAjax(href,true);
-    });
-    
-    $('body').on('click','a[data-toggle="tab"]',function(e){
-        window.history.pushState("", "", document.URL);
-    });
-
     $('body').on('change','select[name=province]',function(e){
         $.ajax({
             type:'GET',

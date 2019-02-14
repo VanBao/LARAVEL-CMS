@@ -199,6 +199,11 @@ class Database
 		return $this->model->toSql();
 	}
 
+	public function getAllColumns($table){
+		$this->setModel($table);
+		return $this->model->getTableColumns();
+	}
+
 }
 
 ?>

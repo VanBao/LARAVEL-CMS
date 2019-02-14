@@ -14,4 +14,8 @@ class Data extends Model
     {
     	return $this->belongsTo("App\Menu", "menu", "id");
     }
+    
+    public function getTableColumns() {
+        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
+    }
 }

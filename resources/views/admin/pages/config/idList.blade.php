@@ -21,33 +21,32 @@
 				  </tr>
 				</thead>
 				<tbody align="center">
-					<?php foreach($listConfigCheck as $data){
-						$nameConfig = $data->name;
-					?>
+					@foreach($listConfigCheck as $data)
+						@php $nameConfig = $data->name; @endphp
 				 	<tr data-id="<?=$data->id?>" align="center">
 				 		<td>
-				 			<label class="control-label" for="f<?=$data->id?>"><?=$data->title?>:</label>
+				 			<label class="control-label" for="f<?=$data->id?>">{{$data->title}}:</label>
 				 		</td>
 				 		<td>
-				 			<?=$nameConfig?>
+				 			{{$nameConfig}}
 				 		</td>
 				 		<td>
 				 			<div class="onoffswitch">
-								<input type="hidden" name="listRow[file][<?=$configMenu->id ?>][<?=$nameConfig?>]" value="0" />
-								<input type="checkbox" <?=returnWhere('checked',$configMenu->$nameConfig,1) ?> name="listRow[file][<?=$configMenu->id ?>][<?=$nameConfig?>]" class="onoffswitch-checkbox <?=$data->group?>" data-name="<?=$data->name?>" id="f<?=$data->id ?>" value="1" />
-								<label class="onoffswitch-label" for="f<?=$data->id ?>"></label>
+								<input type="hidden" name="listRow[file][{{$configMenu->id}}][{{$nameConfig}}]" value="0" />
+								<input type="checkbox" {{returnWhere('checked',$configMenu->$nameConfig,1) }} name="listRow[file][{{$configMenu->id}}][{{$nameConfig}}]" class="onoffswitch-checkbox {{$data->group}}" data-name="{{$data->name}}" id="f{{$data->id}}" value="1" />
+								<label class="onoffswitch-label" for="f{{$data->id}}"></label>
 							</div>
 				 		</td>
 				 	</tr>
-				 	<?php } foreach($listSizeThumbnail as $data){ ?>
+				 	@foreach($listSizeThumbnail as $data)
 				 	<tr>
 				 		<td><label class="control-label" for="<?=$data?>">Giới hạn kích thước ảnh thumbnail</label></td>
-				 		<td><?=$data?></td>
+				 		<td>{{$data}}</td>
 				 		<td>
-				 			<input class="form-control" type="text" name="listRow[file][<?=$configMenu->id ?>][<?=$data?>]" value=<?=$configMenu->$data?>>
+				 			<input class="form-control" type="text" name="listRow[file][{{$configMenu->id}}][{{$data}}]" value='{{$configMenu->$data}}'>
 				 		</td>
 				 	</tr>
-					 <?php } ?>
+					@endforeach
 				</tbody>
 			</table>
 
@@ -153,8 +152,8 @@
 
 		<div data-show="customHtml" class="col-md-12">
 			<label>Custom Html ($menuPage,$idList,$id)</label>
-			<div id="customHtml" class="codeEditor" style="height:650px;"><?=$configMenu->customHtml?></div>
-			<input for="customHtml" type="hidden" name="listRow[file][<?=$configMenu->id?>][customHtml]" value="<?=$configMenu->customHtml?>">
+			<div id="customHtml" class="codeEditor" style="height:650px;">{{$configMenu->customHtml}}</div>
+			<input for="customHtml" type="hidden" name="listRow[file][{{$configMenu->id}}][customHtml]" value="{{$configMenu->customHtml}}">
 		</div>
 </div>
 <script type="text/javascript">

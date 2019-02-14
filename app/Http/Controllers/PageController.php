@@ -241,7 +241,10 @@ public function getData($role = self::USER) {
         $this->menuData["listConfigAdd"] = $this->database->list_data_where("config", "id", "ASC", [["file", "idList"], ["type", "add"]]);
         $this->menuData["listSizeThumbnail"] = array('maxWidth','maxHeight');
         $this->menuData["listType"] = array("text", "file", "content");
-        
+        $this->menuData["listCols"] = $this->database->getAllColumns("data");
+        for($i= 0; $i< 14; $i++){
+            unset($this->menuData["listCols"][$i]);
+        }
         $this->menuData["template"] = "admin.pages.config.idList";
     }
 }
